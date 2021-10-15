@@ -2,8 +2,41 @@
   "name": "wnfs-migration",
   "version": "1.0.1",
   "description": "Migrate your wnfs",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "type": "module",
   "repository": "https://github.com/fission-suite/wnfs-migration",
   "author": "Philipp Krüger <philipp@fission.codes>",
-  "license": "Apache License 2.0"
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=15"
+  },
+  "scripts": {
+    "lint": "yarn eslint src/**/*.ts src/*.ts tests/**/*.ts tests/*.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "blockstore-core": "^1.0.2",
+    "cborg": "^1.5.1",
+    "datastore-core": "^6.0.7",
+    "ipfs-core": "^0.11.1",
+    "it-all": "^1.0.6",
+    "keystore-idb": "^0.15.2",
+    "multiformats": "^9.4.8",
+    "one-webcrypto": "^1.0.1",
+    "tslib": "^2.3.1",
+    "uint8arrays": "^3.0.0",
+    "webnative-0.29.0": "https://github.com/fission-suite/webnative#cad228cf5002341a7d41a171f559932141b59c6d"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "esbuild": "^0.13.6",
+    "eslint": "^8.0.1",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.1.0",
+    "typescript": "^4.4.4"
+  },
+  "resolutions": {
+    "multiformats": "^9.4.8"
+  }
 }
