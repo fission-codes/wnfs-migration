@@ -1,0 +1,9 @@
+{
+  "name": "wnfs-migration",
+  "version": "1.0.1",
+  "description": "Migrate your wnfs",
+  "main": "index.js",
+  "repository": "https://github.com/fission-suite/wnfs-migration",
+  "author": "Philipp Krüger <philipp@fission.codes>",
+  "license": "Apache License 2.0"
+}
