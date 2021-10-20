@@ -26,7 +26,7 @@ export async function* traverseFileSystem(ipfs: IPFS, rootWNFSCID: CID, readKey:
             }
         }
     })
-    
+
     if (filesystem == null) throw "Couldn't load WNFS"
 
     yield* traverseEntries(["public"], filesystem)
@@ -34,10 +34,6 @@ export async function* traverseFileSystem(ipfs: IPFS, rootWNFSCID: CID, readKey:
 }
 
 async function* traverseEntries(pathSoFar: string[], fs: FileSystem): AsyncGenerator<Entry, void> {
-    yield {
-        path: pathSoFar,
-        isFile: false,
-    }
     for (const [name, entry] of Object.entries(await fs.ls(path.directory(...pathSoFar)))) {
         const entryPath = [...pathSoFar, name]
         if (entry.isFile) {
@@ -50,6 +46,10 @@ async function* traverseEntries(pathSoFar: string[], fs: FileSystem): AsyncGener
                 content
             }
         } else {
+            yield {
+                path: entryPath,
+                isFile: false,
+            }
             yield* traverseEntries(entryPath, fs)
         }
     }

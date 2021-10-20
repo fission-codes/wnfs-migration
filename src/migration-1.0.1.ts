@@ -51,7 +51,6 @@ const filesystem = await FileSystem.empty({ rootKey: readKey, localOnly: true, p
 
 for await (const entry of fs_1_0_0.traverseFileSystem(ipfs, wnfsCID, readKey)) {
     console.log(`Processing ${entry.path}`)
-    if (entry.path.length <= 1) continue
     if (entry.isFile) {
         await filesystem.write(path.file(...entry.path), entry.content)
     } else {
@@ -63,13 +62,13 @@ const migratedCID = await filesystem.root.put()
 
 console.log(`Finished migration: ${migratedCID}`)
 
-const carFile = "./migrated.car"
-const stream = fs.createWriteStream(carFile)
-for await (const chunk of ipfs.dag.export(CID.parse(migratedCID))) {
-    stream.write(chunk)
-}
-stream.close()
+// const carFile = "./migrated.car"
+// const stream = fs.createWriteStream(carFile)
+// for await (const chunk of ipfs.dag.export(CID.parse(migratedCID))) {
+//     stream.write(chunk)
+// }
+// stream.close()
 
-console.log(`Wrote to ${carFile}`)
+// console.log(`Wrote to ${carFile}`)
 
 await ipfs.stop()
