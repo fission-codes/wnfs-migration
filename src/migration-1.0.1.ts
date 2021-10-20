@@ -54,25 +54,28 @@ const newMMPT = MMPT.create()
 for (const privateRef of await mmpt.members()) {
     console.log(`migrating block ${privateRef.cid}`)
     const block = uint8arrays.concat(await all(ipfs.cat(privateRef.cid)))
-    const withAlgorithm = cbor.encode({
+    const withHull = cbor.encode({
         alg: "AES-CTR",
         cip: block
     })
-    const withHull = await ipfs.add(withAlgorithm, { cidVersion: 1, pin: false })
-    await newMMPT.add(privateRef.name, withHull.cid.toString())
+    const addResult = await ipfs.add(withHull, { cidVersion: 1, pin: false })
+    await newMMPT.add(privateRef.name, addResult.cid.toString())
 }
 
 filesystem.root.mmpt = newMMPT
-filesystem.root.setVersion({ major: 1, minor: 0, patch: 1 })
-
+await filesystem.root.setVersion({ major: 1, minor: 0, patch: 1 })
+await filesystem.root.updatePuttable("private", newMMPT)
 const migratedCID = await filesystem.root.put()
 
 console.log(`Finished migration: ${migratedCID}`)
 
-const stream = fs.createWriteStream("./migrated.car")
+const carFile = "./migrated.car"
+const stream = fs.createWriteStream(carFile)
 for await (const chunk of ipfs.dag.export(CID.parse(migratedCID))) {
     stream.write(chunk)
 }
 stream.close()
+
+console.log(`Wrote to ${carFile}`)
 
 await ipfs.stop()
