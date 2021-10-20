@@ -5,14 +5,12 @@ import * as ipfsConfig from "webnative-0.29.0/ipfs/config.js"
 import * as setup from "webnative-0.29.0/setup.js"
 import * as identifiers from "webnative-0.29.0/common/identifiers.js"
 import * as path from "webnative-0.29.0/path.js"
+import { isBlob } from "webnative-0.29.0/common/index.js"
 import FileSystem from "webnative-0.29.0/fs/filesystem.js"
-import * as nodeImplementation from "./setup-node-keystore.js"
+import { nodeImplementation } from "./setup-node-keystore.js"
+import { Entry } from "./common.js"
 
-setup.setDependencies(nodeImplementation as any)
-
-export type Entry
-    = { path: string[]; isFile: true; content: webnative.ipfs.FileContent }
-    | { path: string[]; isFile: false }
+setup.setDependencies(nodeImplementation)
 
 export async function* traverseFileSystem(ipfs: IPFS, rootWNFSCID: CID, readKey: string): AsyncGenerator<Entry, void> {
     ipfsConfig.set(ipfs)
@@ -40,6 +38,8 @@ async function* traverseEntries(pathSoFar: string[], fs: FileSystem): AsyncGener
             const content = await fs.read(path.file(...entryPath))
             if (content == null) {
                 console.warn(`Missing file content at ${entryPath}`)
+            } else if (isBlob(content)) {
+                console.warn(`Retrieved file as Blob. We can't handle that. At ${entryPath}`)
             } else yield {
                 path: entryPath,
                 isFile: true,

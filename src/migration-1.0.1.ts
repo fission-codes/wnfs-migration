@@ -9,7 +9,6 @@ AES-GCM or AES-CTR. Previously everything was implicitly AES-CTR.
 
 import all from "it-all"
 import * as fs from "fs"
-import { CID } from "multiformats"
 import * as webnative from "webnative-0.30.0"
 import * as ipfsConfig from "webnative-0.30.0/ipfs/config.js"
 import * as ipfsConfig29 from "webnative-0.29.0/ipfs/config.js"
