@@ -9,62 +9,56 @@ AES-GCM or AES-CTR. Previously everything was implicitly AES-CTR.
 
 import all from "it-all"
 import * as fs from "fs"
-import * as cbor from "cborg"
-import * as uint8arrays from "uint8arrays"
 import { CID } from "multiformats"
-import * as webnative from "webnative-0.29.0"
-import * as ipfsConfig from "webnative-0.29.0/ipfs/config.js"
-import * as identifiers from "webnative-0.29.0/common/identifiers.js"
-import * as path from "webnative-0.29.0/path.js"
-import FileSystem from "webnative-0.29.0/fs/filesystem.js"
-import MMPT from "webnative-0.29.0/fs/protocol/private/mmpt.js"
+import * as webnative from "webnative-0.30.0"
+import * as ipfsConfig from "webnative-0.30.0/ipfs/config.js"
+import * as ipfsConfig29 from "webnative-0.29.0/ipfs/config.js"
+import * as identifiers from "webnative-0.30.0/common/identifiers.js"
+import * as setup from "webnative-0.30.0/setup.js"
+import * as setup29 from "webnative-0.29.0/setup.js"
+import * as path from "webnative-0.30.0/path.js"
+import FileSystem from "webnative-0.30.0/fs/filesystem.js"
 
-import "./setup-node-keystore.js"
+import { nodeImplementation } from "./setup-node-keystore.js"
 import { createInMemoryIPFS } from "./in-memory-ipfs.js"
+import * as fs_1_0_0 from "./fs-1.0.0.js"
 
 
 const ipfs = await createInMemoryIPFS()
-ipfsConfig.set(ipfs)
 
 const [root] = await all(ipfs.dag.import(fs.createReadStream("./tests/fixtures/wnfs-1.0.1-example.car")))
+if (root == null) {
+    throw new Error(`Couldn't figure out root CID from given CAR file.`)
+}
 const wnfsCID = root.root.cid
 
-console.log(wnfsCID)
+console.log(`Loaded filesystem from CAR file: ${wnfsCID.toString()}`)
+
+setup.setDependencies(nodeImplementation)
+setup29.setDependencies(nodeImplementation)
+ipfsConfig.set(ipfs)
+ipfsConfig29.set(ipfs)
 
 const readKey = "pJW/xgBGck9/ZXwQHNPhV3zSuqGlUpXiChxwigwvUws="
 await webnative.crypto.keystore.importSymmKey(readKey, await identifiers.readKey({ path: path.directory("private") }))
 
-const filesystem = await FileSystem.fromCID(wnfsCID.toString(), {
-    localOnly: true,
-    permissions: {
-        fs: {
-            public: [path.root()],
-            private: [path.root()]
-        }
+const filesystem = await FileSystem.empty({ rootKey: readKey, localOnly: true, permissions: {
+    fs: {
+        private: [path.root()],
+        public: [path.root()],
     }
-})
+}})
 
-if (filesystem == null) throw "Couldn't load WNFS"
-
-// here is the bulk of the work: Load all MMPT nodes and wrap them with some cbor
-const mmpt = filesystem.root.mmpt
-
-const newMMPT = MMPT.create()
-
-for (const privateRef of await mmpt.members()) {
-    console.log(`migrating block ${privateRef.cid}`)
-    const block = uint8arrays.concat(await all(ipfs.cat(privateRef.cid)))
-    const withHull = cbor.encode({
-        alg: "AES-CTR",
-        cip: block
-    })
-    const addResult = await ipfs.add(withHull, { cidVersion: 1, pin: false })
-    await newMMPT.add(privateRef.name, addResult.cid.toString())
+for await (const entry of fs_1_0_0.traverseFileSystem(ipfs, wnfsCID, readKey)) {
+    console.log(`Processing ${entry.path}`)
+    if (entry.path.length <= 1) continue
+    if (entry.isFile) {
+        await filesystem.write(path.file(...entry.path), entry.content)
+    } else {
+        await filesystem.mkdir(path.directory(...entry.path))
+    }
 }
 
-filesystem.root.mmpt = newMMPT
-await filesystem.root.setVersion({ major: 1, minor: 0, patch: 1 })
-await filesystem.root.updatePuttable("private", newMMPT)
 const migratedCID = await filesystem.root.put()
 
 console.log(`Finished migration: ${migratedCID}`)

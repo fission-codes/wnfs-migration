@@ -8,11 +8,6 @@ import aes from "keystore-idb/lib/aes/index.js"
 import rsa from "keystore-idb/lib/rsa/index.js"
 
 import { Storage } from "./in-memory.js"
-import { setDependencies } from "webnative-0.29.0/setup/dependencies.js"
-import * as setup from "webnative-0.29.0/setup.js"
-
-setup.shouldPin({ enabled: false })
-
 
 
 //-------------------------------------
@@ -273,7 +268,7 @@ const getKeystore = (() => {
 
 const inMemoryStorage = new Storage()
 
-export const NODE_IMPLEMENTATION = {
+export const nodeImplementation = {
   hash: {
     sha256: sha256
   },
@@ -333,5 +328,3 @@ export const NODE_IMPLEMENTATION = {
     clear: inMemoryStorage.clear,
   }
 }
-
-setDependencies(NODE_IMPLEMENTATION)
