@@ -15,12 +15,15 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@types/js-yaml": "^4.0.4",
     "blockstore-core": "^1.0.2",
     "cborg": "^1.5.1",
     "datastore-core": "^6.0.7",
     "ipfs-core": "^0.11.1",
+    "ipfs-http-client": "^53.0.1",
     "it-all": "^1.0.6",
     "it-map": "^1.0.6",
+    "js-yaml": "^4.1.0",
     "keystore-idb": "^0.15.2",
     "multiformats": "^9.4.8",
     "one-webcrypto": "^1.0.1",
@@ -34,6 +37,7 @@
     "@typescript-eslint/parser": "^5.0.0",
     "esbuild": "^0.13.6",
     "eslint": "^8.0.1",
+    "ipfs-core-types": "^0.8.1",
     "rimraf": "^3.0.2",
     "ts-node": "^10.1.0",
     "typescript": "^4.4.4"
