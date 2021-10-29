@@ -10,8 +10,8 @@ import * as path from "webnative-0.30/path.js"
 import { isBlob } from "webnative-0.30/common/index.js"
 import FileSystem from "webnative-0.30/fs/filesystem.js"
 // relative imports
-import { nodeImplementation } from "./setup-node-keystore.js"
-import { Entry } from "./common.js"
+import { nodeImplementation } from "../utils/setup-node-keystore.js"
+import { Entry } from "../common.js"
 
 
 setup.setDependencies(nodeImplementation)

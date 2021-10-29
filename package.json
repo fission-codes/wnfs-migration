@@ -13,7 +13,7 @@
   "scripts": {
     "lint": "yarn eslint src/**/*.ts src/*.ts tests/**/*.ts tests/*.ts",
     "build": "tsc",
-    "start": "node --no-warnings --loader=ts-node/esm src/cli/index.ts"
+    "start": "node --no-warnings --loader=ts-node/esm src/index.ts"
   },
   "dependencies": {
     "@types/js-yaml": "^4.0.4",

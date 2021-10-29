@@ -10,18 +10,13 @@ import * as uint8arrays from "uint8arrays"
 import * as webnative from "webnative-0.30"
 import * as ed25519 from "noble-ed25519"
 
-import { nodeImplementation } from "../setup-node-keystore.js"
 import { CLIContext, createContext } from "./context.js"
 import { createFissionConnectedIPFS } from "../fission/ipfs.js"
-import * as fs_1_0_0 from "../fs-1.0.0.js"
-import * as fs_1_0_1 from "../fs-1.0.1.js"
+import * as fs_1_0_0 from "../versions/fs-1.0.0.js"
+import * as fs_1_0_1 from "../versions/fs-1.0.1.js"
 
 
-run()
-
-async function run() {
-    webnative.setup.setDependencies(nodeImplementation)
-
+export async function run() {
     const context = createContext(path.join(os.homedir(), ".config/fission"), webnative.setup.endpoints({}))
 
     console.log(`Looking up user ${context.fissionConfig.username}`)
@@ -33,6 +28,17 @@ async function run() {
     const { ipfs, ipfsProcess } = await createFissionConnectedIPFS(context)
     // will log success
     try {
+        const version = uint8arrays.toString(uint8arrays.concat(await itAll(ipfs.cat(`${dataRoot}/version`))))
+        console.log(`Your filesystem currently is at version ${version}`)
+
+        if (version === "1.0.1") {
+            throw new Error(`This migration tool is made for migrations from version 1.0.0 to 1.0.1. This account has already been migrated.`)
+        }
+
+        if (version !== "1.0.0") {
+            throw new Error(`This migration tool is made for migrations from version 1.0.0 to 1.0.1. You might need a newer version of this migration tool.`)
+        }
+
         const readKey = context.wnfsReadKey
         const migratedCID = await fs_1_0_1.filesystemFromEntries(
             itMap(fs_1_0_0.traverseFileSystem(ipfs, dataRoot, readKey), async entry => {

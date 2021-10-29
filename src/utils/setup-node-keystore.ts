@@ -2,8 +2,7 @@ import { webcrypto } from "one-webcrypto"
 
 import tweetnacl from "tweetnacl"
 import utils from "keystore-idb/lib/utils.js"
-import { CharSize, Config, CryptoSystem, KeyStore, KeyUse, Msg, PublicKey, SymmKeyLength } from "keystore-idb/lib/types.js"
-import config from "keystore-idb/lib/config.js"
+import { CharSize, SymmKeyLength } from "keystore-idb/lib/types.js"
 import aes from "keystore-idb/lib/aes/index.js"
 import rsa from "keystore-idb/lib/rsa/index.js"
 
