@@ -12,7 +12,8 @@
   },
   "scripts": {
     "lint": "yarn eslint src/**/*.ts src/*.ts tests/**/*.ts tests/*.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node --no-warnings --loader=ts-node/esm src/cli/index.ts"
   },
   "dependencies": {
     "@types/js-yaml": "^4.0.4",
@@ -27,6 +28,8 @@
     "js-yaml": "^4.1.0",
     "keystore-idb": "^0.15.2",
     "multiformats": "^9.4.8",
+    "noble-ed25519": "^1.2.6",
+    "node-fetch": "^3.0.0",
     "one-webcrypto": "^1.0.1",
     "tslib": "^2.3.1",
     "uint8arrays": "^3.0.0",

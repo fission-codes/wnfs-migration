@@ -37,6 +37,9 @@ export async function* traverseFileSystem(ipfs: IPFS, rootWNFSCID: CID, readKey:
 
 async function* traverseEntries(pathSoFar: string[], fs: FileSystem): AsyncGenerator<Entry, void> {
     for (const [name, entry] of Object.entries(await fs.ls(path.directory(...pathSoFar)))) {
+        // not sure why this happens
+        if (name == null || name.length == null || name.length == 0) continue
+        
         const entryPath = [...pathSoFar, name]
         if (entry.isFile) {
             const content = await fs.read(path.file(...entryPath))
@@ -54,7 +57,11 @@ async function* traverseEntries(pathSoFar: string[], fs: FileSystem): AsyncGener
                 path: entryPath,
                 isFile: false,
             }
-            yield* traverseEntries(entryPath, fs)
+            try {
+                yield* traverseEntries(entryPath, fs)
+            } catch (e) {
+                console.error(`Skipping some paths in ${path.toPosix(path.directory(...entryPath))} due to errors` + (e instanceof Error ? ` ("${e.message}").` : ","))
+            }
         }
     }
 }
@@ -72,10 +79,14 @@ export async function filesystemFromEntries(entryStream: AsyncIterable<Entry>, i
     }})
 
     for await (const entry of entryStream) {
-        if (entry.isFile) {
-            await filesystem.write(path.file(...entry.path), entry.content)
-        } else {
-            await filesystem.mkdir(path.directory(...entry.path))
+        try {
+            if (entry.isFile) {
+                await filesystem.write(path.file(...entry.path), entry.content)
+            } else {
+                await filesystem.mkdir(path.directory(...entry.path))
+            }
+        } catch (e) {
+            console.error(`Error while trying to process ${path.toPosix(path.file(...entry.path))}` + (e instanceof Error ? ` ("${e.message}")` : "") + " continuing.")
         }
     }
 

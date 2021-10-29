@@ -8,6 +8,8 @@ export interface FissionConfig {
     signing_key_path: string
 }
 
+export type FissionStore = Record<string, Record<string, string>>
+
 export function isFissionConfig(obj: unknown): obj is FissionConfig {
     return isRecord(obj)
         && hasProp(obj, "ignore") && Array.isArray(obj.ignore) && obj.ignore.every(i => typeof i === "string")
@@ -19,6 +21,13 @@ export function isFissionConfig(obj: unknown): obj is FissionConfig {
         && hasProp(obj, "signing_key_path") && typeof obj.signing_key_path === "string"
 }
 
+export function isFissionStore(obj: unknown): obj is FissionStore {
+    function recordOfStrings(obj: unknown): obj is Record<string, string> {
+        return isRecordOf(obj, isString)
+    }
+    return isRecordOf(obj, recordOfStrings)
+}
+
 export function hasProp<K extends PropertyKey>(data: unknown, prop: K): data is Record<K, unknown> {
     return typeof data === "object" && data != null && prop in data
 }
@@ -26,3 +35,20 @@ export function hasProp<K extends PropertyKey>(data: unknown, prop: K): data is 
 export function isRecord(data: unknown): data is Record<PropertyKey, unknown> {
     return typeof data === "object" && data != null
 }
+
+export function isString(obj: unknown): obj is string {
+    return typeof obj === "string"
+}
+
+export function isRecordOf<V>(data: unknown, isV: (value: unknown) => value is V): data is Record<string, V> {
+    if (!isRecord(data)) return false
+  
+    for (const [name, value] of Object.entries(data)) {
+      if (!isV(value)) {
+        return false
+      }
+    }
+  
+    return true
+  }
+  
