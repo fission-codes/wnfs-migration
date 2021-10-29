@@ -2,8 +2,11 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "target": "ES2018",
-    "module":"ESNext",
-    "lib": ["dom", "es2021"],
+    "module": "ESNext",
+    "lib": [
+      "dom",
+      "es2021"
+    ],
     "strict": true,
     "sourceMap": true,
     "declaration": true,
@@ -16,10 +19,5 @@
   },
   "include": [
     "src/**/*"
-  ],
-  "exclude": [
-    "src/**/*.test.ts",
-    "tests/**/*",
-    "src/setup/node.ts"
   ]
 }
