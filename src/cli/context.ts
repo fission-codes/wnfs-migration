@@ -1,5 +1,5 @@
 import type { Config as IPFSConfig } from "ipfs-core-types/src/config"
-import type { Endpoints } from "webnative-0.30.0/setup/internal"
+import type { Endpoints } from "webnative-0.30/setup/internal"
 
 import path from "path"
 import fs from "fs"

@@ -7,7 +7,7 @@ import { CID } from "multiformats"
 import { IPFS } from "ipfs-core"
 import fetch from "node-fetch"
 import * as uint8arrays from "uint8arrays"
-import * as webnative from "webnative-0.30.0"
+import * as webnative from "webnative-0.30"
 import * as ed25519 from "noble-ed25519"
 
 import { nodeImplementation } from "../setup-node-keystore.js"
