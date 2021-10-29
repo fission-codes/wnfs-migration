@@ -14,53 +14,58 @@ import { nodeImplementation } from "../setup-node-keystore.js"
 import { CLIContext, createContext } from "./context.js"
 import { createFissionConnectedIPFS } from "../fission/ipfs.js"
 import * as fs_1_0_0 from "../fs-1.0.0.js"
+import * as fs_1_0_1 from "../fs-1.0.1.js"
 
-webnative.setup.setDependencies(nodeImplementation)
 
-const context = createContext(path.join(os.homedir(), ".config/fission"), webnative.setup.endpoints({}))
+run()
 
-console.log(`Looking up user ${context.fissionConfig.username}`)
+async function run() {
+    webnative.setup.setDependencies(nodeImplementation)
 
-const dataRoot = await figureOutDataRoot(context)
+    const context = createContext(path.join(os.homedir(), ".config/fission"), webnative.setup.endpoints({}))
 
-console.log("Loading IPFS...")
+    console.log(`Looking up user ${context.fissionConfig.username}`)
 
-const { ipfs, ipfsProcess } = await createFissionConnectedIPFS(context)
-// will log success
-try {
-    const readKey = context.wnfsReadKey
-    const migratedCID = await fs_1_0_0.filesystemFromEntries(
-        itMap(fs_1_0_0.traverseFileSystem(ipfs, dataRoot, readKey), async entry => {
-            console.log(`Processing ${webnative.path.toPosix(webnative.path.file(...entry.path))}`)
-            return entry
-        }),
-        ipfs,
-        readKey
-    )
+    const dataRoot = await figureOutDataRoot(context)
 
-    console.log(`Finished migration: ${migratedCID}`)
+    console.log("Loading IPFS...")
 
-    const answers = await inquirer.prompt([{
-        name: "confirmed",
-        type: "confirm",
-        message: "Are you sure you want to overwrite your filesystem with a migrated version?"
-    }])
+    const { ipfs, ipfsProcess } = await createFissionConnectedIPFS(context)
+    // will log success
+    try {
+        const readKey = context.wnfsReadKey
+        const migratedCID = await fs_1_0_1.filesystemFromEntries(
+            itMap(fs_1_0_0.traverseFileSystem(ipfs, dataRoot, readKey), async entry => {
+                console.log(`Processing ${webnative.path.toPosix(webnative.path.file(...entry.path))}`)
+                return entry
+            }),
+            ipfs,
+            readKey
+        )
 
-    if (!answers.confirmed) {
-        throw new Error(`User cancelled.`)
+        console.log(`Finished migration: ${migratedCID}`)
+
+        const answers = await inquirer.prompt([{
+            name: "confirmed",
+            type: "confirm",
+            message: "Are you sure you want to overwrite your filesystem with a migrated version?"
+        }])
+
+        if (!answers.confirmed) {
+            throw new Error(`User cancelled.`)
+        }
+
+        const ucan = await figureOutUcan(context, ipfs)
+
+        console.log(`Created authorization UCAN. Updating data root...`)
+
+        await setDataRoot(migratedCID, `Bearer ${ucan}`, context)
+
+        console.log(`Migration done!`)
+    } finally {
+        ipfsProcess.kill()
     }
-
-    const ucan = await figureOutUcan(context, ipfs)
-
-    console.log(`Created authorization UCAN. Updating data root...`)
-
-    await setDataRoot(migratedCID, `Bearer ${ucan}`, context)
-
-    console.log(`Migration done!`)
-} finally {
-    ipfsProcess.kill()
 }
-
 
 
 async function figureOutDataRoot(context: CLIContext): Promise<CID> {
@@ -88,7 +93,7 @@ async function figureOutUcan(context: CLIContext, ipfs: IPFS): Promise<string> {
 
     const pubKey = await ed25519.getPublicKey(context.writeKey)
     const ourDid = webnative.did.publicKeyToDid(uint8arrays.toString(pubKey, "base64pad"), webnative.did.KeyType.Edwards)
-    
+
     const ucanParts = await webnative.ucan.build({
         addSignature: false,
         audience: context.fissionConfig.server_did,
@@ -100,12 +105,12 @@ async function figureOutUcan(context: CLIContext, ipfs: IPFS): Promise<string> {
 
     // monkey-patch the algorithm to match what we're doing
     ucanParts.header.alg = "EdDSA"
-    
+
     const encoded = {
         header: webnative.ucan.encodeHeader(ucanParts.header),
         payload: webnative.ucan.encodePayload(ucanParts.payload),
     }
-    
+
     const headerAndPayload = `${encoded.header}.${encoded.payload}`
     const signature = uint8arrays.toString(await ed25519.sign(uint8arrays.fromString(headerAndPayload), context.writeKey), "base64urlpad")
     return `${headerAndPayload}.${signature}`
