@@ -1,26 +1,27 @@
-![](https://github.com/fission-suite/PROJECTNAME/raw/master/assets/logo.png?sanitize=true)
+# WNFS-Migration
 
-# Project Name
-
-[![Build Status](https://travis-ci.org/fission-suite/PROJECTNAME.svg?branch=master)](https://travis-ci.org/fission-suite/PROJECTNAME)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/fission-suite/blob/master/LICENSE)
-[![Maintainability](https://api.codeclimate.com/v1/badges/44fb6a8a0cfd88bc41ef/maintainability)](https://codeclimate.com/github/fission-suite/PROJECTNAME/maintainability)
-[![Built by FISSION](https://img.shields.io/badge/⌘-Built_by_FISSION-purple.svg)](https://fission.codes)
 [![Discord](https://img.shields.io/discord/478735028319158273.svg)](https://discord.gg/zAQBDEq)
 [![Discourse](https://img.shields.io/discourse/https/talk.fission.codes/topics)](https://talk.fission.codes)
 
-An amazing description goes here!
+This is a command-line-interface tool to help you upgrade your filesystem from older versions of WNFS to newer versions.
 
-[Try it out!](https://linktoalivedemo.example.com)
-
-# QuickStart
+## Usage
 
 ```shell
-# IPFS on MacOS, otherwise https://docs.ipfs.io/introduction/install/
-brew install ipfs
-brew service start ipfs
+# make sure you've linked your browser account to your CLI
+$ fission setup
+🌱 Setting up environment
+🪐 Downloading managed IPFS for Linux
+🎛️ Configuring managed IPFS
+🔑 Setting up keys
+🏠 Do you have an existing account? [Y/n] Y
+🔗 Please open auth.fission.codes on a signed-in device
+📛 Please enter your username: <your username>
+🔢 Confirmation code: [2, 1, 1, 6, 0, 7]
+🎛️ Initializing user config file
+✅ Done! Welcome to Fission, <your username> ✨
+# make sure you've installed npm (npmjs.com)
+$ npm install wnfs-migration
+$ wnfs-migration
 ```
-
-# Table of Contents
-
-# How To
