@@ -19,15 +19,18 @@ import * as fs_1_0_1 from "../versions/fs-1.0.1.js"
 export async function run() {
     const context = createContext(path.join(os.homedir(), ".config/fission"), webnative.setup.endpoints({}))
 
-    console.log(`Looking up user ${context.fissionConfig.username}`)
+    console.log(`Looking up data root for ${context.fissionConfig.username}`)
 
     const dataRoot = await figureOutDataRoot(context)
 
+    console.log(`Data root is ${dataRoot}`)
+
     console.log("Loading IPFS...")
 
-    const { ipfs, ipfsProcess } = await createFissionConnectedIPFS(context)
+    const { ipfs, controller } = await createFissionConnectedIPFS(context)
     // will log success
     try {
+        console.log(`Looking up your filesystem version (https://${context.fissionConfig.username}.files.fission.name/version)`)
         const version = uint8arrays.toString(uint8arrays.concat(await itAll(ipfs.cat(`${dataRoot}/version`))))
         console.log(`Your filesystem currently is at version ${version}`)
 
@@ -69,7 +72,8 @@ export async function run() {
 
         console.log(`Migration done!`)
     } finally {
-        ipfsProcess.kill()
+        console.log(`Shutting down IPFS...`)
+        controller.abort()
     }
 }
 

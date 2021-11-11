@@ -3,9 +3,12 @@ import path from "path"
 import * as IPFS from "ipfs-http-client"
 
 import { CLIContext } from "../cli/context.js"
+import { keepConnectionWith } from "./peering.js"
 
 
-export async function createFissionConnectedIPFS(context: CLIContext) {
+export async function createFissionConnectedIPFS(context: CLIContext): Promise<{ ipfs: IPFS.IPFSHTTPClient; controller: AbortController }> {
+    const controller = new AbortController()
+
     // TODO: Handle the case that IPFS is already running gracefully.
     // Doing that would require checking whether the ipfs http api already responds.
     // If it doesn't, make sure to remove the repo.lock and run ipfs.
@@ -17,6 +20,12 @@ export async function createFissionConnectedIPFS(context: CLIContext) {
             stdio: ["ignore", "pipe", "inherit"]
         }
     )
+
+    controller.signal.addEventListener("abort", () => {
+        if (!ipfsProcess.killed) {
+            ipfsProcess.kill()
+        }
+    }, { once: true })
 
     try {
         await new Promise<string>((resolve, reject) => {
@@ -39,6 +48,8 @@ export async function createFissionConnectedIPFS(context: CLIContext) {
         const maxRetries = 3
         const timeout = 20 * 1000 // ms
 
+        console.log(`Connected to local ipfs node, version ${(await ipfs.version()).version}`)
+
         for (let retry = 0; retry < maxRetries; retry++) {
             try {
                 await Promise.any(peers.map(addr => ipfs.swarm.connect(addr, { timeout })))
@@ -54,9 +65,13 @@ export async function createFissionConnectedIPFS(context: CLIContext) {
         }
         console.log("Connected to the Fission IPFS Cluster")
 
-        return { ipfs, ipfsProcess }
+        for (const peer of peers) {
+            keepConnectionWith(ipfs, peer, controller.signal, () => {})
+        }
+
+        return { ipfs, controller }
     } catch (e) {
-        ipfsProcess.kill()
+        controller.abort()
         throw e
     }
 }

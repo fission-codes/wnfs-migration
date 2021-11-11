@@ -1,8 +1,9 @@
 {
   "name": "wnfs-migration",
-  "version": "1.0.1-alpha",
+  "version": "1.0.1-alpha3",
   "description": "Migrate your wnfs",
   "main": "lib/index.js",
+  "bin": "lib/index.js",
   "type": "module",
   "repository": "https://github.com/fission-suite/wnfs-migration",
   "author": "Philipp Krüger <philipp@fission.codes>",
