@@ -13,7 +13,7 @@ import * as ed25519 from "noble-ed25519"
 import { CLIContext, createContext } from "./context.js"
 import { createFissionConnectedIPFS } from "../fission/ipfs.js"
 import * as fs_1_0_0 from "../versions/fs-1.0.0.js"
-import * as fs_1_0_1 from "../versions/fs-1.0.1.js"
+import * as fs_2_0_0 from "../versions/fs-2.0.0.js"
 
 
 export async function run() {
@@ -34,16 +34,16 @@ export async function run() {
         const version = uint8arrays.toString(uint8arrays.concat(await itAll(ipfs.cat(`${dataRoot}/version`))))
         console.log(`Your filesystem currently is at version ${version}`)
 
-        if (version === "1.0.1") {
-            throw new Error(`This migration tool is made for migrations from version 1.0.0 to 1.0.1. This account has already been migrated.`)
+        if (version === "2.0.0") {
+            throw new Error(`This migration tool is made for migrations from version 1.0.0 to 2.0.0. This account has already been migrated.`)
         }
 
         if (version !== "1.0.0") {
-            throw new Error(`This migration tool is made for migrations from version 1.0.0 to 1.0.1. You might need a newer version of this migration tool.`)
+            throw new Error(`This migration tool is made for migrations from version 1.0.0 to 2.0.0. You might need a newer version of this migration tool.`)
         }
 
         const readKey = context.wnfsReadKey
-        const migratedCID = await fs_1_0_1.filesystemFromEntries(
+        const migratedCID = await fs_2_0_0.filesystemFromEntries(
             itMap(fs_1_0_0.traverseFileSystem(ipfs, dataRoot, readKey), async entry => {
                 console.log(`Processing ${webnative.path.toPosix(webnative.path.file(...entry.path))}`)
                 return entry
