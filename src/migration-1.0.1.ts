@@ -12,7 +12,9 @@ import itMap from "it-map"
 import * as fs from "fs"
 
 import { createInMemoryIPFS } from "./in-memory-ipfs.js"
-import * as fs_1_0_0 from "./fs-1.0.0.js"
+import * as fs1 from "./fs-1.0.0.js"
+import * as fs2 from "./fs-1.0.1.js"
+import { CID } from "multiformats"
 
 
 const ipfs = await createInMemoryIPFS()
@@ -27,8 +29,8 @@ console.log(`Loaded filesystem from CAR file: ${wnfsCID.toString()}`)
 
 const readKey = "pJW/xgBGck9/ZXwQHNPhV3zSuqGlUpXiChxwigwvUws="
 
-const migratedCID = await fs_1_0_0.filesystemFromEntries(
-    itMap(fs_1_0_0.traverseFileSystem(ipfs, wnfsCID, readKey), async entry => {
+const migratedCID = await fs2.filesystemFromEntries(
+    itMap(fs1.traverseFileSystem(ipfs, wnfsCID, readKey), async entry => {
         console.log(`Processing ${entry.path}`)
         return entry
     }),
@@ -39,13 +41,13 @@ const migratedCID = await fs_1_0_0.filesystemFromEntries(
 
 console.log(`Finished migration: ${migratedCID}`)
 
-// const carFile = "./migrated.car"
-// const stream = fs.createWriteStream(carFile)
-// for await (const chunk of ipfs.dag.export(CID.parse(migratedCID))) {
-//     stream.write(chunk)
-// }
-// stream.close()
+const carFile = "./migrated.car"
+const stream = fs.createWriteStream(carFile)
+for await (const chunk of ipfs.dag.export(CID.parse(migratedCID.toString()))) {
+    stream.write(chunk)
+}
+stream.close()
 
-// console.log(`Wrote to ${carFile}`)
+console.log(`Wrote to ${carFile}`)
 
 await ipfs.stop()
