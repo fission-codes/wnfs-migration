@@ -25,3 +25,13 @@ $ fission setup
 $ npm install wnfs-migration
 $ wnfs-migration
 ```
+
+## Versions
+
+Here's a table of what versions of WNFS different versions of `wnfs-migration` help you migrate to.
+The current row will always help you migrate to a WNFS version from the row above. 
+
+| WNFS version | webnative version | `wnfs-migration` version |
+|-------------:|------------------:|-------------------------:|
+|        1.0.0 |   0.20.0 - 0.29.2 |          -none-          |
+|        2.0.0 |  0.30.0 - current |                    2.0.0 |
