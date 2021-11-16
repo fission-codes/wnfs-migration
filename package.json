@@ -1,6 +1,6 @@
 {
   "name": "wnfs-migration",
-  "version": "2.0.0-alpha1",
+  "version": "2.0.0-alpha2",
   "description": "Migrate your wnfs",
   "main": "lib/index.js",
   "bin": "lib/index.js",
@@ -34,8 +34,8 @@
     "one-webcrypto": "^1.0.1",
     "tslib": "^2.3.1",
     "uint8arrays": "^3.0.0",
-    "webnative-0.29": "https://github.com/fission-suite/webnative#cad228cf5002341a7d41a171f559932141b59c6d",
-    "webnative-0.30": "https://github.com/fission-suite/webnative#matheus23/aes-gcm-try-2"
+    "webnative-0.29": "npm:webnative@0.29.3",
+    "webnative-0.30": "npm:webnative@0.30.0-alpha5"
   },
   "devDependencies": {
     "@types/inquirer": "^8.1.3",

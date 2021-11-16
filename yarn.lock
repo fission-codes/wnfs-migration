@@ -2631,7 +2631,7 @@ keypair@^1.0.1:
   resolved "https://registry.yarnpkg.com/keypair/-/keypair-1.0.4.tgz#a749a45f388593f3950f18b3757d32a93bd8ce83"
   integrity sha512-zwhgOhhniaL7oxMgUMKKw5219PWWABMO+dgMnzJOQ2/5L3XJtTJGhW2PEXlxXj9zaccdReZJZ83+4NPhVfNVDg==
 
-keystore-idb@^0.15.1, keystore-idb@^0.15.2:
+keystore-idb@^0.15.2:
   version "0.15.2"
   resolved "https://registry.yarnpkg.com/keystore-idb/-/keystore-idb-0.15.2.tgz#4f391df01d10bb8ef8514668801fa9b8e57d1989"
   integrity sha512-EncMTE/05LAw94ij7qgkXyNY7RErEJFueAhyaa+qqIbGYbiMBHKYSqHE+BvFz6GEk2udM+T4R/iKlenh10Rt4w==
@@ -4265,9 +4265,10 @@ webidl-conversions@^3.0.0:
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-3.0.1.tgz#24534275e2a7bc6be7bc86611cc16ae0a5654871"
   integrity sha1-JFNCdeKnvGvnvIZhHMFq4KVlSHE=
 
-"webnative-0.29@https://github.com/fission-suite/webnative#cad228cf5002341a7d41a171f559932141b59c6d":
-  version "0.29.0"
-  resolved "https://github.com/fission-suite/webnative#cad228cf5002341a7d41a171f559932141b59c6d"
+"webnative-0.29@npm:webnative@0.29.3":
+  version "0.29.3"
+  resolved "https://registry.yarnpkg.com/webnative/-/webnative-0.29.3.tgz#678f572ccc872a14db5b2848c14981ad3eda164a"
+  integrity sha512-x59GbYH3v5YGAJ0iuVr7Esq+hA5jQ3PuCUxBxlZXYyUNBzUpQ24EghsEazHZ6fbznIWr1mmN6RAWu7cQ9pY6Ag==
   dependencies:
     "@ipld/dag-pb" "^2.1.11"
     cborg "^1.3.4"
@@ -4276,16 +4277,18 @@ webidl-conversions@^3.0.0:
     ipfs-message-port-client "^0.9.2-rc.2"
     ipfs-message-port-protocol "^0.10.2-rc.2"
     ipld-dag-pb "^0.22.2"
-    keystore-idb "^0.15.1"
+    keystore-idb "^0.15.4"
     localforage "^1.9.0"
     multiformats "^9.4.8"
+    one-webcrypto "^1.0.3"
     throttle-debounce "^3.0.1"
     tweetnacl "^0.14.5"
     uint8arrays "^2.1.7"
 
-"webnative-0.30@https://github.com/fission-suite/webnative#matheus23/aes-gcm-try-2":
-  version "0.30.0-alpha3"
-  resolved "https://github.com/fission-suite/webnative#40128873bc4bfb54c4a98e839d29a2cac63d8574"
+"webnative-0.30@npm:webnative@0.30.0-alpha5":
+  version "0.30.0-alpha5"
+  resolved "https://registry.yarnpkg.com/webnative/-/webnative-0.30.0-alpha5.tgz#2a9e5fd8326476282de1fbbc8e07e90aca068ee6"
+  integrity sha512-1s3lvGwjvB3XYaJnsLu5Cpwt6mjFRfpy3wf0NydzTElZOWpj3FJ3rdOxQQpJqV2yAD2IH43ZYTFI/d1TLaN1dw==
   dependencies:
     "@ipld/dag-pb" "^2.1.11"
     cborg "^1.3.4"

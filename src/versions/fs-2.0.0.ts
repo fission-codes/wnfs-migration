@@ -8,6 +8,7 @@ import * as setup from "webnative-0.30/setup.js"
 import * as identifiers from "webnative-0.30/common/identifiers.js"
 import * as path from "webnative-0.30/path.js"
 import { isBlob } from "webnative-0.30/common/index.js"
+import { isSoftLink } from "webnative-0.30/fs/types/check.js"
 import FileSystem from "webnative-0.30/fs/filesystem.js"
 // relative imports
 import { nodeImplementation } from "../utils/setup-node-keystore.js"
@@ -39,8 +40,11 @@ async function* traverseEntries(pathSoFar: string[], fs: FileSystem): AsyncGener
     for (const [name, entry] of Object.entries(await fs.ls(path.directory(...pathSoFar)))) {
         // not sure why this happens
         if (name == null || name.length == null || name.length == 0) continue
-        
+
         const entryPath = [...pathSoFar, name]
+        if (isSoftLink(entry)) {
+            continue // FIXME for future migrations from 0.30 upwards.
+        }
         if (entry.isFile) {
             const content = await fs.read(path.file(...entryPath))
             if (content == null) {
