@@ -27,7 +27,7 @@
     "it-all": "^1.0.6",
     "it-map": "^1.0.6",
     "js-yaml": "^4.1.0",
-    "keystore-idb": "^0.15.2",
+    "keystore-idb": "^0.15.4",
     "multiformats": "^9.4.8",
     "noble-ed25519": "^1.2.6",
     "node-fetch": "^3.0.0",
