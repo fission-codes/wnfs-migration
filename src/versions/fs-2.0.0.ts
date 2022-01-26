@@ -20,7 +20,7 @@ setup.setDependencies(nodeImplementation)
 export async function* traverseFileSystem(ipfs: IPFS, rootWNFSCID: CID, readKey: string): AsyncGenerator<Entry, void> {
     ipfsConfig.set(ipfs)
     await webnative.crypto.keystore.importSymmKey(readKey, await identifiers.readKey({ path: path.directory("private") }))
-    const filesystem = await FileSystem.fromCID(rootWNFSCID.toString(), {
+    const filesystem = await FileSystem.fromCID(rootWNFSCID, {
         localOnly: true,
         permissions: {
             fs: {
@@ -94,5 +94,5 @@ export async function filesystemFromEntries(entryStream: AsyncIterable<Entry>, i
         }
     }
 
-    return CID.parse(await filesystem.root.put())
+    return await filesystem.root.put()
 }
