@@ -75,6 +75,7 @@ export async function run() {
         console.error(e)
     } finally {
         console.log(`Shutting down IPFS...`)
+        await ipfs.stop()
         controller.abort()
     }
 }
