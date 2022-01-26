@@ -71,6 +71,8 @@ export async function run() {
         await setDataRoot(migratedCID, `Bearer ${ucan}`, context)
 
         console.log(`Migration done!`)
+    } catch (e) {
+        console.error(e)
     } finally {
         console.log(`Shutting down IPFS...`)
         controller.abort()
