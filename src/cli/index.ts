@@ -8,7 +8,7 @@ import { IPFS } from "ipfs-core"
 import fetch from "node-fetch"
 import * as uint8arrays from "uint8arrays"
 import * as webnative from "webnative-0.30"
-import * as ed25519 from "noble-ed25519"
+import * as ed25519 from "@noble/ed25519"
 
 import { CLIContext, createContext } from "./context.js"
 import { createFissionConnectedIPFS } from "../fission/ipfs.js"
@@ -162,4 +162,3 @@ async function setDataRoot(dataRoot: CID, jwt: string, context: CLIContext): Pro
         throw new Error(`Failed to update data root. HTTP Code ${resp.status}. Message: ${await resp.text()}`)
     }
 }
-
