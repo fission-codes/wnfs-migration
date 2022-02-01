@@ -12,9 +12,9 @@
     "node": ">=15"
   },
   "scripts": {
-    "lint": "\"$npm_execpath\" eslint src/**/*.ts src/*.ts tests/**/*.ts tests/*.ts",
+    "lint": "\"$npm_execpath\" exec eslint src/**/*.ts src/*.ts",
     "build": "tsc",
-    "prepare": "\"$npm_execpath\" build",
+    "prepare": "\"$npm_execpath\" run build",
     "start": "node --no-warnings --loader=ts-node/esm src/index.ts"
   },
   "dependencies": {
