@@ -70,6 +70,8 @@ export async function run() {
             throw new Error(`User cancelled.`)
         }
 
+        console.log(`Creating authorization UCAN.`)
+
         const ucan = await figureOutUcan(context, ipfs)
 
         console.log(`Created authorization UCAN. Updating data root...`)

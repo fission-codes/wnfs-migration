@@ -1,6 +1,6 @@
 {
   "name": "wnfs-migration",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Migrate your wnfs",
   "main": "lib/index.js",
   "bin": "lib/index.js",
