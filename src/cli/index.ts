@@ -7,6 +7,7 @@ import itAll from "it-all"
 import itMap from "it-map"
 import inquirer from "inquirer"
 import { CID } from "multiformats"
+import { EventEmitter } from "events"
 import { IPFS } from "ipfs-core"
 import * as uint8arrays from "uint8arrays"
 import * as webnative from "webnative-0.30"
@@ -19,6 +20,8 @@ import * as fs_2_0_0 from "../versions/fs-2.0.0.js"
 
 
 export async function run() {
+    EventEmitter.defaultMaxListeners = 0
+
     const context = createContext(path.join(os.homedir(), ".config/fission"), webnative.setup.endpoints({}))
 
     console.log(`Looking up data root for ${context.fissionConfig.username}`)
