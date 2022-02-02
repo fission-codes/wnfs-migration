@@ -1,14 +1,16 @@
 import type { IPFS } from "ipfs-core"
 
 import * as fs from "fs"
+import * as os from "os"
+import * as path from "path"
+
 import * as dagPB from "@ipld/dag-pb"
 import * as Ipfs from "ipfs-core"
-import tempDir from "ipfs-utils/src/temp-dir.js"
-import { createRepo } from "ipfs-repo"
 import { BlockCodec } from "multiformats/codecs/interface"
 import { MemoryDatastore } from "datastore-core/memory"
 import { MemoryBlockstore } from "blockstore-core/memory"
-
+import { createRepo } from "ipfs-repo"
+import { nanoid } from "nanoid"
 
 
 export async function createInMemoryIPFS(): Promise<IPFS> {
@@ -73,4 +75,10 @@ export async function createInMemoryIPFS(): Promise<IPFS> {
     }
     )
   })
+}
+
+
+function tempDir(): string {
+  const osTmpDir = fs.realpathSync(os.tmpdir())
+  return path.join(osTmpDir, nanoid())
 }

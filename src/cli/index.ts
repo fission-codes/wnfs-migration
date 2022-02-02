@@ -1,3 +1,6 @@
+/// <reference path="../types.d.ts" />
+import fetch from "node-fetch"
+
 import os from "os"
 import path from "path"
 import itAll from "it-all"
@@ -5,7 +8,6 @@ import itMap from "it-map"
 import inquirer from "inquirer"
 import { CID } from "multiformats"
 import { IPFS } from "ipfs-core"
-import fetch from "node-fetch"
 import * as uint8arrays from "uint8arrays"
 import * as webnative from "webnative-0.30"
 import * as ed25519 from "@noble/ed25519"
@@ -29,6 +31,7 @@ export async function run() {
 
     const { ipfs, controller } = await createFissionConnectedIPFS(context)
     // will log success
+
     try {
         console.log(`Looking up your filesystem version (https://${context.fissionConfig.username}.files.fission.name/version)`)
         const version = uint8arrays.toString(uint8arrays.concat(await itAll(ipfs.cat(`${dataRoot}/version`))))
@@ -71,12 +74,15 @@ export async function run() {
         await setDataRoot(migratedCID, `Bearer ${ucan}`, context)
 
         console.log(`Migration done!`)
+
     } catch (e) {
         console.error(e)
+
     } finally {
         console.log(`Shutting down IPFS...`)
         await ipfs.stop()
         controller.abort()
+
     }
 }
 
