@@ -1,4 +1,6 @@
 import * as IPFS from "ipfs-core"
+import * as process from "child_process"
+import * as path from "path"
 
 import { CLIContext } from "../cli/context.js"
 import { keepConnectionWith } from "./peering.js"
@@ -40,7 +42,7 @@ export async function createFissionConnectedIPFS(context: CLIContext): Promise<{
         console.log("Connected to the Fission IPFS Cluster")
 
         for (const peer of peers) {
-            keepConnectionWith(ipfs, peer, controller.signal, () => {})
+            keepConnectionWith(ipfs, peer, controller.signal, () => null)
         }
 
         return { ipfs, controller }
@@ -48,4 +50,34 @@ export async function createFissionConnectedIPFS(context: CLIContext): Promise<{
         controller.abort()
         throw e
     }
+}
+
+export function runFissionIpfsCommand(command: string[], context: CLIContext, signal?: AbortSignal): Promise<string> {
+    const ipfsCommand = ["--config", path.join(context.fissionDir, "ipfs/"), ...command]
+    const ipfsProcess = process.spawn(
+        context.ipfsBinPath,
+        ipfsCommand,
+        {
+            // ignore stdin, pipe stdout for us to receive, inherit our stderr (print errors to the console)
+            stdio: ["ignore", "pipe", "inherit"]
+        }
+    )
+
+    let output = ""
+    ipfsProcess.stdout.setEncoding("utf8")
+    ipfsProcess.stdout.on("data", (chunk: string) => output += chunk)
+
+    return new Promise((resolve, reject) => {
+        ipfsProcess.on("exit", code => {
+            if (code === 0) {
+                resolve(output)
+            } else {
+                reject(new Error(`Running "${ipfsCommand.join(" ")}" exited with code ${code}`))
+            }
+        })
+
+        signal?.addEventListener("abort", () => {
+            reject(new Error("Aborted"))
+        })
+    })
 }
