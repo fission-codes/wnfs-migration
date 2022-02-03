@@ -8,13 +8,12 @@ import itMap from "it-map"
 import inquirer from "inquirer"
 import { CID } from "multiformats"
 import { EventEmitter } from "events"
-import { IPFS } from "ipfs-core"
 import * as uint8arrays from "uint8arrays"
 import * as webnative from "webnative-0.30"
 import * as ed25519 from "@noble/ed25519"
 
 import { CLIContext, createContext } from "./context.js"
-import { createFissionConnectedIPFS } from "../fission/ipfs.js"
+import { createFissionConnectedIPFS, runFissionIpfsCommand } from "../fission/ipfs.js"
 import * as fs_1_0_0 from "../versions/fs-1.0.0.js"
 import * as fs_2_0_0 from "../versions/fs-2.0.0.js"
 
@@ -72,7 +71,7 @@ export async function run() {
 
         console.log(`Creating authorization UCAN.`)
 
-        const ucan = await figureOutUcan(context, ipfs)
+        const ucan = await figureOutUcan(context, controller.signal)
 
         console.log(`Created authorization UCAN. Updating data root...`)
 
@@ -82,12 +81,15 @@ export async function run() {
 
     } catch (e) {
         console.error(e)
+        process.exitCode = 1
 
     } finally {
         console.log(`Shutting down IPFS...`)
         await ipfs.stop()
         controller.abort()
-
+        // 5 sec timeout
+        await new Promise(resolve => setTimeout(resolve, 5000))
+        process.exit()
     }
 }
 
@@ -100,11 +102,12 @@ async function figureOutDataRoot(context: CLIContext): Promise<CID> {
     return dataRoot
 }
 
-async function figureOutUcan(context: CLIContext, ipfs: IPFS): Promise<string> {
+async function figureOutUcan(context: CLIContext, signal: AbortSignal): Promise<string> {
     let proof
     if (context.fissionConfigRootProof != null) {
-        const tokenPath = `${context.fissionConfigRootProof.toString()}/bearer.jwt`
-        const resolved = JSON.parse(uint8arrays.toString(uint8arrays.concat(await itAll(ipfs.cat(tokenPath)))))
+        const tokenPath = `/ipfs/${context.fissionConfigRootProof.toString()}/bearer.jwt`
+        const token = await runFissionIpfsCommand(["cat", tokenPath], context, timeout(10000, signal))
+        const resolved = JSON.parse(token)
         if (typeof resolved !== "string") {
             throw new Error(`Couldn't parse UCAN at ${tokenPath}: ${resolved}`)
         }
@@ -172,4 +175,24 @@ async function setDataRoot(dataRoot: CID, jwt: string, context: CLIContext): Pro
     if (!resp.ok) {
         throw new Error(`Failed to update data root. HTTP Code ${resp.status}. Message: ${await resp.text()}`)
     }
+}
+
+function timeout(ms: number, signal?: AbortSignal): AbortSignal {
+
+    const controller = new AbortController()
+    const id = setTimeout(() => {
+        controller.abort()
+        signal?.removeEventListener("abort", onOuterAbort)
+    }, ms)
+
+    // Yes, this is weird.
+    // eslint-disable-next-line no-inner-declarations
+    function onOuterAbort() {
+        clearTimeout(id)
+        controller.abort()
+    }
+
+    signal?.addEventListener("abort", onOuterAbort, { once: true })
+
+    return controller.signal
 }
