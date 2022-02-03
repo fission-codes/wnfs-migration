@@ -34,6 +34,8 @@ export async function run() {
     const { ipfs, controller } = await createFissionConnectedIPFS(context)
     // will log success
 
+    process.on("SIGTERM", () => controller.abort())
+
     try {
         console.log(`Looking up your filesystem version (https://${context.fissionConfig.username}.files.fission.name/version)`)
         const version = uint8arrays.toString(uint8arrays.concat(await itAll(ipfs.cat(`${dataRoot}/version`))))
@@ -75,7 +77,15 @@ export async function run() {
 
         console.log(`Created authorization UCAN. Updating data root...`)
 
-        await setDataRoot(migratedCID, `Bearer ${ucan}`, context)
+        while (!controller.signal.aborted) {
+            try {
+                await setDataRoot(migratedCID, `Bearer ${ucan}`, context, controller.signal)
+            } catch (e) {
+                console.error("Error while setting data root:")
+                console.error(e)
+                console.error("Retrying...")
+            }
+        }
 
         console.log(`Migration done!`)
 
@@ -163,7 +173,7 @@ async function getUsernameDataRoot(username: string, context: CLIContext): Promi
 }
 
 // The JWT identifiers the user
-async function setDataRoot(dataRoot: CID, jwt: string, context: CLIContext): Promise<void> {
+async function setDataRoot(dataRoot: CID, jwt: string, context: CLIContext, signal?: AbortSignal): Promise<void> {
     const apiEndpoint = `${context.endpoints.api}/${context.endpoints.apiVersion}/api`
 
     const resp = await fetch(`${apiEndpoint}/user/data/${dataRoot.toString()}`, {
@@ -171,6 +181,7 @@ async function setDataRoot(dataRoot: CID, jwt: string, context: CLIContext): Pro
         headers: {
             "authorization": jwt
         },
+        signal,
     })
     if (!resp.ok) {
         throw new Error(`Failed to update data root. HTTP Code ${resp.status}. Message: ${await resp.text()}`)
